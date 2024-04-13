@@ -1,0 +1,23 @@
+body {
+    background-color: #323232;
+}
+
+.metro {
+    color:#F8F1AD
+}
+
+.events {
+    color:#EDACA3
+}
+
+Link {
+    font-size: small;
+}
+
+p {
+    font-size: small;
+}
+
+h1 {
+    color: black;
+}

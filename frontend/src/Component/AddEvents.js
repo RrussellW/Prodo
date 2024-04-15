@@ -10,7 +10,7 @@ export default function AddEvents(data) {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
-  const [organizer, setOrganizer] = useState("");
+  const [organizer, setOrganizer] = useState(data.name);
   const [show, setShow] = useState("");
   const [alert, setAlert] = useState("");
   const [result, setResult] = useState("");

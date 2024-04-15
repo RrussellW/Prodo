@@ -21,3 +21,32 @@ p {
 h1 {
     color: black;
 }
+
+.box-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* Optional: Adds space between the boxes */
+   }
+
+   .boxTab {
+    flex: 1; /* Optional: Makes each box take up an equal amount of space */
+    /*border: 1px solid #ccc; /* Optional: Adds a border around each box */
+    max-width: 30%;
+   }
+
+   .boxTabCenter {
+    flex: 1; /* Optional: Makes each box take up an equal amount of space */
+    /*border: 1px solid #ccc; /* Optional: Adds a border around each box */
+    width: 60%;
+   }
+
+   .boxTabRight {
+    flex: 1; /* Optional: Makes each box take up an equal amount of space */
+    /*border-left: 10px solid black; /* Optional: Adds a border around each box */
+    /*border-bottom: 10px solid black;*/
+    max-width: 20%;
+   }
+
+   ::-webkit-scrollbar {
+    display: none;
+}

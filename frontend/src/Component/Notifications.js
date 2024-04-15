@@ -33,17 +33,16 @@ export default function Notifications(data) {
       setMessage("Error fetching reviews.");
     });
     }
-////////////////notifications
+
     if(data.name) {
       Axios.post("http://localhost:5000/getnotifications", {
-      title: data.title,
-      user: user,
+      user: data.name,
   })
   .then(res => {
-      if(res.data.status === "Success") {
+      if(res.data.Status === "Success") {
           setNotifs(res.data.notifications);
           setHasNotif(true);
-      } else if(res.data.status === "No Requests"){
+      } else if(res.data.status === "No notifications found"){
           setHasNotif(false);
       }
   }).catch(error => {
@@ -122,7 +121,7 @@ export default function Notifications(data) {
         alignItems: 'center',
         '-ms-overflow-style': 'none',
         'scrollbar-color': 'black'}}>
-            {hasrequest && (requests.map((request, index) => {
+            {hasrequest && (data.role!=='user') && (requests.map((request, index) => {
               return (
                 <Card key={index} sx={{ backgroundColor: '#323232', color: 'white', margin: '5px'}}>
                   
@@ -134,11 +133,11 @@ export default function Notifications(data) {
 
                     {request.user !== data.name && (<CardActions sx={{padding: '20px'}}>
                         
-                        <Fab variant="extended" sx={{backgroundColor: '#FDFFC3'}} aria-label="edit" size='small' onClick={() => acceptRequest(request.title,request.user)}>
+                        <Fab variant="extended" sx={{backgroundColor: '#FDFFC3'}} aria-label="edit" size='small' onClick={() => acceptRequest(request.event_id,request.user)}>
                         <AddReaction />Accept
                         </Fab>
 
-                        <Fab variant="extended" sx={{backgroundColor: '#FF8282'}} aria-label="edit" size='small' onClick={() => rejectRequest(request.title,request.user)}>
+                        <Fab variant="extended" sx={{backgroundColor: '#FF8282'}} aria-label="edit" size='small' onClick={() => rejectRequest(request.event_id,request.user)}>
                          Decline
                         </Fab>
                     </CardActions>
@@ -148,7 +147,7 @@ export default function Notifications(data) {
                 </Card>
               );
             }))}
-            {!hasrequest && (
+            {!hasrequest && (data.role!=='user') && (
               <Card sx={{ backgroundColor: '#323232', color: 'white'}}>
                 <CardContent>
                   <Typography variant="subtitle2" sx={{color: '#FDFFC3'}}>No Requests Yet</Typography>
@@ -167,7 +166,7 @@ export default function Notifications(data) {
                         <Typography variant="body1" color="#9AA8FF">{notif.message}</Typography>
                       </CardContent>
 
-                    <CardActions sx={{padding: '20px'}}>
+                    {/*<CardActions sx={{padding: '20px'}}>
                         
                         <Fab variant="extended" sx={{backgroundColor: '#FDFFC3'}} aria-label="edit" size='small' >
                         <AddReaction />Accept
@@ -176,11 +175,20 @@ export default function Notifications(data) {
                         <Fab variant="extended" sx={{backgroundColor: '#FF8282'}} aria-label="edit" size='small' >
                          Decline
                         </Fab>
-                    </CardActions>
+                    </CardActions>*/}
                 
                 </Card>
               );
             }))}
+
+            {!hasnotif && (
+              <Card sx={{ backgroundColor: '#323232', color: 'white'}}>
+                <CardContent>
+                  <Typography variant="subtitle2" sx={{color: '#FDFFC3'}}>No Event Notifications Yet</Typography>
+                </CardContent>
+              </Card>
+            )
+          }
         </Box>
       </AppBar>
 )};

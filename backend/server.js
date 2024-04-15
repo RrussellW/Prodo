@@ -179,19 +179,18 @@ app.post('/cancelevent', (req, res) => {
     //console.log(title + " TITLE")
 
 
-    con.query("SELECT * FROM events WHERE title = ?", [title],
+    con.query("SELECT * FROM events WHERE event_id = ?", [title],
     (err,result) => {
         if(err) {
             console.log(err);
             return res.json({message: "Error Occurred"})
         } else {
             if(result.length > 0) {
-                con.query("UPDATE events SET status ='0' WHERE title = ?", [title],
+                con.query("UPDATE events SET status ='0' WHERE event_id = ?", [title],
                 (err,affectedRows) => {
                     if(affectedRows > 0) {
-                        con.query("DELETE * FROM reviews WHERE event = ?", [title])
                         const message = "The event - " + title + " has been cancelled due to " + reason;
-                        con.query("INSERT INTO notifications (event, message, status) VALUES (?, ?, '1')",[title, message]);
+                        con.query("INSERT INTO notifications (event, message) VALUES (?, ?)",[title, message]);
                         console.log("notification")
                         console.log("Cancelled Event")
                         return res.json({message: "Cancelled"});
@@ -213,7 +212,7 @@ app.post('/cancelevent', (req, res) => {
 app.post('/getevents', (req, res) => {
     const user = req.body.user;
 
-    con.query("SELECT DISTINCT e.title,e.description, e.date, e.location, e.organizer, p.status AS pstatus FROM events e LEFT JOIN participants p ON e.title = p.event AND p.user = ? WHERE e.status = '1'",[user],
+    con.query("SELECT DISTINCT e.event_id, e.title,e.description, e.date, e.location, e.organizer, p.status AS pstatus FROM events e LEFT JOIN participants p ON e.event_id = p.event AND p.user = ? WHERE e.status = '1'",[user],
     (err,result) => {
         if(err) {
             console.log(err);
@@ -251,24 +250,30 @@ app.post('/getaccepted', (req, res) => {
 });
 
 app.post('/getnotifications', (req, res) => {
-    const title = req.body.title;
+    const user = req.body.user;
 
-    con.query("SELECT * FROM notifications WHERE event = ?", [title],
-    (err,result) => {
-        if(err) {
+    if (!user) {
+        return res.json({ message: "Please provide a user" });
+    }
+
+    con.query(`SELECT n.* FROM notifications n INNER JOIN participants p ON n.event = p.event WHERE p.user = ?`, [user, user],
+    (err, result) => {
+        if (err) {
             console.log(err);
-            res.json({message: "Error Occurred"});
+            return res.json({ message: "Error Occurred" });
         } else {
-            if(result.length > 0) {
+            if (result.length > 0) {
                 console.log("Notifications found");
-                return res.json({Status: "Success", notifications: result});
+                return res.json({ Status: "Success", notifications: result });
             } else {
                 console.log("No notifications found");
-                return res.json({message: "No notifications found"});
+                return res.json({ message: "No notifications found" });
             }
         }
     });
 });
+
+
 
 
 app.post('/addupvote', (req, res) => {
@@ -356,14 +361,14 @@ app.post('/getreviews', (req, res) => {
 
 app.post('/joinevent', (req, res) => {
     const user = req.body.user;
-    const event = req.body.event;
+    const eventid = req.body.eventid;
 
-    if(event == "" || user == "") {
+    if(eventid == "" || user == "") {
         res.json({message: "Enter correct review details"})
         return(err);
     }
 
-    con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'accepted'", [user, event],
+    con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'accepted'", [user, eventid],
                 (err,result) => {
                     if(err) {
                         console.log(err);
@@ -374,7 +379,7 @@ app.post('/joinevent', (req, res) => {
                             return res.json({message: "Accepted"})
                         } else {
 
-                            con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'pending'", [user, event],
+                            con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'pending'", [user, eventid],
                             (err,result) => {
                                 if(err) {
                                     console.log(err);
@@ -383,7 +388,7 @@ app.post('/joinevent', (req, res) => {
                                         console.log("Request already exists");
                                         return res.json({message: "Request already exists"})
                                 } else {
-                                    con.query("INSERT INTO participants (user, event, status) Values (?, ?, 'pending')", [user, event],
+                                    con.query("INSERT INTO participants (user, event, status) Values (?, ?, 'pending')", [user, eventid],
                                                         (err,result) => {
                                                                 if(result) {
                                                                     return res.json({message: "Request created"});
@@ -448,7 +453,7 @@ app.post('/checkrequest', (req, res) => {
 app.post('/getrequests', (req, res) => {
     const organizer = req.body.user;
 
-    con.query("SELECT e.organizer, p.user, p.status, e.title FROM events e INNER JOIN participants p ON e.title = p.event WHERE e.organizer = ? AND p.status = 'pending'",[organizer],
+    con.query("SELECT e.event_id, e.organizer, p.user, p.status, e.title FROM events e INNER JOIN participants p ON e.event_id = p.event WHERE e.organizer = ? AND p.status = 'pending'",[organizer],
     (err,result) => {
         if(err) {
             console.log(err);
@@ -477,8 +482,6 @@ app.post('/acceptrequest', (req, res) => {
             res.json({message: "Error Occurred"})
         } else {
             if(result.affectedRows > 0) {
-                const message = "You have been invited to join the event - " + title;
-                con.query("INSERT INTO notifications (event, message, status) VALUES (?, ?, '1')",[title, message]);
                 console.log("Accepted")
                 res.json({requests: result})
             } else {

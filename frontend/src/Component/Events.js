@@ -50,14 +50,14 @@ function handleClose() {
 }
 
 
-function reviewSelect(title){
-  data.setTitle(title);
+function reviewSelect(eventid){
+  data.setTitle(eventid);
 }
 
-function joinEvent(title) {
+function joinEvent(eventid) {
   setUser(data.name);
       Axios.post("http://localhost:5000/joinevent", {
-          event: title,
+          eventid: eventid,
           user: user,
       }).then((res) =>  {
           if(res.data.message === "Request created") {
@@ -74,9 +74,9 @@ function joinEvent(title) {
       .catch(err => console.log(err));
   }
 
-  function cancelEvent(title) {
+  function cancelEvent(eventid) {
         Axios.post("http://localhost:5000/cancelevent", {
-            title: title,
+            eventid: eventid,
         }).then((res) =>  {
             if(res.data.message === "Cancelled") {
               handleOpen("Cancelled event")
@@ -89,24 +89,6 @@ function joinEvent(title) {
 
             updateComponent()
 
-        })
-        .catch(err => console.log(err));
-    }
-
-  function checkRequest(title) {
-    setUser(data.name);
-        Axios.post("http://localhost:5000/checkrequest", {
-            event: title,
-            user: user,
-        }).then((res) =>  {
-            if(res.data.message === "No request") {
-              setStatus("No request")
-            } else if(res.data.message === "Accepted"){
-              setStatus("Already Participating")
-            } else {
-              setStatus("Request Pending")
-            }
-            handleOpen(status)
         })
         .catch(err => console.log(err));
     }
@@ -143,24 +125,24 @@ function joinEvent(title) {
                   </Fab>
 
                   {!isOrganizer && !isNull && (event.pstatus === "accepted") && (
-                  <Button startIcon={<DoneAll /> } variant="outline" sx={{color:"#89FF91"}} aria-label="edit" size='small' onClick={() => joinEvent(event.title)}>
+                  <Button startIcon={<DoneAll /> } variant="outline" sx={{color:"#89FF91"}} aria-label="edit" size='small' onClick={() => joinEvent(event.event_id)}>
                   ACCEPTED
                   </Button>
                   )}
 
                   {!isOrganizer && (event.pstatus !== "accepted") && (
-                  <LoadingButton loadingPosition="start" startIcon={<AddReaction />} loading={!isNull} variant="contained" color="success" aria-label="edit" size='medium' onClick={() => joinEvent(event.title)}>
+                  <LoadingButton loadingPosition="start" startIcon={<AddReaction />} loading={!isNull} variant="contained" color="success" aria-label="edit" size='medium' onClick={() => joinEvent(event.event_id)}>
                     {isNull && (<span>JOIN</span>)}
                     {!isNull && (<span>PENDING</span>)}
                   </LoadingButton>
                   )}
 
                   {isOrganizer && (
-                  <Button startIcon={<RemoveCircle />} variant="contained" color="error" aria-label="edit" size='small' onClick={() => cancelEvent(event.title)}>
+                  <Button startIcon={<RemoveCircle />} variant="contained" color="error" aria-label="edit" size='small' onClick={() => cancelEvent(event.event_id)}>
                     Cancel
                   </Button>
                   )}
-                  <Button startIcon={<Reviews /> } variant="contained" color="warning" aria-label="edit" size='small' onClick={() => reviewSelect(event.title)}>
+                  <Button startIcon={<Reviews /> } variant="contained" color="warning" aria-label="edit" size='small' onClick={() => reviewSelect(event.event_id)}>
                   Reviews
                   </Button>
                   

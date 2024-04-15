@@ -88,7 +88,7 @@ export default function Home() {
                     </TabList>
                     </Box>
                     <TabPanel value="1">
-                        <Notifications name = {name} title = {titlereview}/>
+                        <Notifications name = {name} title = {titlereview} role={role} />
                     </TabPanel>
                     <TabPanel value="2">
                         <PromoteUser name = {name}/>

@@ -28,9 +28,13 @@ return (
         <Typography variant="h6" component="div" sx={{color: '#9AA8FF'}}>
           METRO
         </Typography>
-        <Typography variant="h6" component="div" sx={{flexGrow: 1, color: '#FDFFC3'}}>
-          <span> Events</span>
+        <Typography variant="h6" component="div" sx={{color: '#FDFFC3'}}>
+          Events
         </Typography>
+        <Typography variant="h6" component="div" sx={{flexGrow: 1, color: '#9AA8FF', marginLeft: '50px'}}>
+          <span> {data.role}</span>
+        </Typography>
+
         <Button color="inherit" sx={{color: '#FF8282'}} onClick={logout}>Logout {data.name}</Button>
       </Toolbar>
     </AppBar>

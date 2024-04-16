@@ -108,6 +108,15 @@ export default function Notifications(data) {
         });
         }
     }
+
+    function isWithinWeek(eventDate) {
+      const today = new Date();
+      const firstDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+      const lastDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6);
+      const eventDateTime = new Date(eventDate).getTime();
+    
+      return eventDateTime >= firstDayOfWeek.getTime() && eventDateTime <= lastDayOfWeek.getTime();
+    }
     
 
  return (
@@ -160,22 +169,29 @@ export default function Notifications(data) {
             {hasnotif && (notifs.map((notif, index) => {
               const isRejected = notif.status === 'rejected'
               const onGoing = notif.eventstatus
-              const dateOptions = { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' };
-              const formattedDate = new Date(notif.date).toLocaleDateString('en-US', dateOptions);
+              const dateOptions = { timeZone: 'GMT', month: 'long', day: 'numeric', year: 'numeric' };
+              const formattedDate = new Date(notif.date).toLocaleDateString('en-US', { ...dateOptions, timeZone: 'Asia/Manila' });
 
               const today = new Date();
-              const todayFormatted = today.toLocaleDateString('en-US', dateOptions);
+              const todayFormatted = today.toLocaleDateString('en-US', { ...dateOptions, timeZone: 'Asia/Manila' });
               const isToday = formattedDate === todayFormatted;
 
               return (
                 <Card key={index} sx={{ backgroundColor: '#3C3C3C', color: 'white', margin: '5px'}}>
+                  
                     {(onGoing === 1) && isToday && (
-                        <div>
-                          <Typography variant="h6" color="#89FF91">{notif.title}</Typography>
-                          <Typography variant="subtitle2" color="#89FF91">The event {notif.title} is happening today!</Typography>
-                        </div>
+                        <CardContent sx={{backgroundColor: 'green'}}>
+                          <Typography variant="h6" color="#89FF91">Today</Typography>
+                          <Typography variant="subtitle2" color="white">The event {notif.title} is happening today!</Typography>
+                        </CardContent>
                       )}
 
+                    {(onGoing === 1) && isWithinWeek && !isToday && (
+                            <CardContent sx={{backgroundColor: '#4F4F4F'}}>
+                              <Typography variant="h6" color="#89FF91">This Week</Typography>
+                              <Typography variant="subtitle2" color="white">The event {notif.title} is happening this week!</Typography>
+                            </CardContent>
+                          )}
                     {!isRejected && (notif.status !== 'pending') && (
                       <CardContent >
                         {!onGoing && (
@@ -184,7 +200,6 @@ export default function Notifications(data) {
 
                         {(onGoing === 1) && (
                           <div>
-                            <Typography variant="h6" color="#89FF91">{notif.title}</Typography>
                             <Typography variant="subtitle2" color="#89FF91">{notif.message}</Typography>
                           </div>
                         )}

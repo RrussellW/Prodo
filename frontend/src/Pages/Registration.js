@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import {Button, Alert} from '@mui/material';
 import './Login.css'
 import { Link } from 'react-router-dom';
 import {useState} from "react"
@@ -10,6 +10,9 @@ export default function Registration() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [show, setShow] = useState(false)
+    const [alert, setAlert] = useState("warning")
+    const [message, setMessage] = useState("")
 
     const register = (e) => {
         e.preventDefault();
@@ -18,9 +21,13 @@ export default function Registration() {
             password: password,
         }).then((res) =>  {
             if(res.data.message === "Account created") {
-                alert(res.data.message);
+                setMessage(res.data.message);
+                setAlert("success")
+                setShow(true)
             } else {
-                alert(res.data.message);
+                setMessage(res.data.message);
+                setAlert("warning")
+                setShow(true)
             }
         })
     }
@@ -48,9 +55,10 @@ export default function Registration() {
                     autoComplete="off"
                 >
                     <h1>Sign Up</h1>
+                    {show && (<Alert variant="filled" severity={alert} >{message}</Alert>)}
                     <br />
-                    <TextField id="emailText" label="Email" onChange={(e) => {setEmail(e.target.value)}} variant="outlined" sx={{margin: '5px'}}/>
-                    <TextField id="passwordText" label="Password" onChange={(e) => {setPassword(e.target.value)}} variant="outlined" type="password" sx={{marginBottom: '25px'}}/>
+                    <TextField id="emailText" onClick={() => setShow(false)} label="Email" onChange={(e) => {setEmail(e.target.value)}} type='email' variant="outlined" sx={{margin: '5px'}}/>
+                    <TextField id="passwordText" onClick={() => setShow(false)} label="Password" onChange={(e) => {setPassword(e.target.value)}} variant="outlined" type="password" sx={{marginBottom: '25px'}}/>
                     <Button variant="contained" type="submit" onClick={register}>
                         <span>Register</span>
                     </Button>
@@ -59,6 +67,7 @@ export default function Registration() {
                         <Link to="/login">Already Have an Account? Sign In</Link>
                     </p>
                 </Box>
+                
             </div>
         </body>
         </html>

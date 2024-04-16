@@ -25,6 +25,11 @@ app.post('/registration', (req, res) => {
     console.log(email);
     console.log(password);
 
+    if(email === "" || password === "") {
+        console.log("No input");
+        return res.json({message: "Fields must not be blank"})
+    }
+
     con.query("SELECT * FROM users WHERE email = ? AND password = ?", [email, password],
     (err,result) => {
         if(err) {
@@ -207,7 +212,7 @@ app.post('/cancelevent', (req, res) => {
                 con.query("UPDATE events SET status ='0' WHERE event_id = ?", [eventid],
                 (err,result) => {
                     if(result.affectedRows > 0) {
-                        const message = "The event " + title + " has been cancelled due to " + reason;
+                        const message = "The event " + title + " has been cancelled. Given reason: (" + reason + ")";
                         con.query("UPDATE notifications SET message = ? WHERE event = ?",[message, eventid]);
                         console.log("notification")
                         console.log("Cancelled Event")

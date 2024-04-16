@@ -164,8 +164,8 @@ function joinEvent(eventid) {
         'scrollbar-color': 'transparent transparent'}}>
             {(!noevents) && events && (events.map((event, index) => {
               // Format the date
-              const dateOptions = { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' };
-              const formattedDate = new Date(event.date).toLocaleDateString('en-US', dateOptions);
+              const dateOptions = { timeZone: 'GMT', month: 'long', day: 'numeric', year: 'numeric' };
+              const formattedDate = new Date(event.date).toLocaleDateString('en-US', { ...dateOptions, timeZone: 'Asia/Manila' });
               const isOrganizer = data.name === event.organizer
               const isNull = event.pstatus === null;
               

@@ -57,7 +57,7 @@ export default function AddReview(data) {
       <h1>Add Review</h1>
       <Box component="form" noValidate sx={{ marginTop: '20px', flexDirection: 'column' }}>
 
-        <TextField fullWidth id="comment" onChange={(e) => {setComment(e.target.value);setShow(false)}} label="Review" variant="outlined" sx={{backgroundColor: "white", marginBottom: "10px", marginTop: "10px"}}/>
+        <TextField fullWidth id="comment" onClick={() => setShow(false)} onChange={(e) => {setComment(e.target.value);setShow(false)}} label="Review" variant="outlined" sx={{backgroundColor: "white", marginBottom: "10px", marginTop: "10px"}}/>
 
       </Box>
       <Box sx={{ marginTop: '20px' }}>
@@ -66,6 +66,6 @@ export default function AddReview(data) {
         </Fab>
       </Box>
       <br />
-      {(<Alert variant="filled" severity={alert} >{result}</Alert>)}
+      {show && (<Alert variant="filled" severity={alert} >{result}</Alert>)}
     </Box>
 )};

@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import {Button, Alert} from '@mui/material';
 import './Login.css'
 import { Link,useNavigate } from 'react-router-dom';
 import {useState} from "react"
@@ -11,6 +11,9 @@ export default function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [show, setShow] = useState(false)
+    const [alert, setAlert] = useState("warning")
+    const [message, setMessage] = useState("")
     const navigate = useNavigate();
 
     Axios.defaults.withCredentials = true;
@@ -24,7 +27,9 @@ export default function Login() {
             if(res.data.Status === "Success") {
                 navigate('/home');
             } else {
-                alert(res.data.message);
+                setAlert("warning")
+                setShow(true)
+                setMessage(res.data.message);
             }
         })
         .catch(err => console.log(err));
@@ -52,9 +57,10 @@ export default function Login() {
                     autoComplete="off"
                 >
                     <h1>Sign In</h1>
+                    {show && (<Alert variant="filled" severity={alert} >{message}</Alert>)}
                     <br />
-                    <TextField id="outlined-basic" onChange={(e) => {setEmail(e.target.value)}} label="Email" variant="outlined" sx={{margin: '5px'}}/>
-                    <TextField id="outlined-basic" onChange={(e) => {setPassword(e.target.value)}} label="Password" variant="outlined" type="password" sx={{marginBottom: '25px'}}/>
+                    <TextField id="outlined-basic" onClick={() => setShow(false)} onChange={(e) => {setEmail(e.target.value)}} label="Email" variant="outlined" sx={{margin: '5px'}}/>
+                    <TextField id="outlined-basic" onClick={() => setShow(false)} onChange={(e) => {setPassword(e.target.value)}} label="Password" variant="outlined" type="password" sx={{marginBottom: '25px'}}/>
                     <Button variant="contained" onClick={login}>
                         Login
                     </Button>

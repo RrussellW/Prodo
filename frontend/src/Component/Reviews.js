@@ -11,7 +11,7 @@ export default function Review(data) {
   const [upvote, setUpvote] = useState("tertiary");
 
   useEffect(() => {
-    if(data.title) {
+    if(data.title !== null) {
         Axios.post("http://localhost:5000/getReviews", {
         title: data.title,
     })
@@ -33,7 +33,7 @@ export default function Review(data) {
  return (
       <AppBar position="static" sx={{Width: '100px', backgroundColor: 'black', justifyContent: 'center', alignContent: 'center', padding: '5px', marginLeft: 'auto'}}>
         <Toolbar sx={{backgroundColor: 'Black'}}>
-        <Typography variant="h5" color="#9AA8FF">{data.title} Reviews </Typography>
+        <Typography variant="h5" color="#9AA8FF"> Reviews </Typography>
         </Toolbar>
         <Box sx={{ overflowY: 'auto', maxHeight: '450px', maxWidth: '100%', backgroundColor: 'black', padding: '10px',
           borderRadius: '10px',

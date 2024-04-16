@@ -61,6 +61,7 @@ export default function Home() {
     function setTitle(title) {
         if(showreview && title===titlereview){
             setShowReview(false)
+            setTitleReview(title);
         } else {
             setTitleReview(title);
             setShowReview(true)
@@ -114,7 +115,7 @@ export default function Home() {
                     </TabList>
                     </Box>
                     <TabPanel value="1">
-                        <Events name = {name} setTitle = {setTitle}/>
+                        <Events name = {name} setTitle = {setTitle} setShowReview = {setShowReview} role={role}/>
                     </TabPanel>
                     <TabPanel value="2">
                         <AddEvents name = {name}/>

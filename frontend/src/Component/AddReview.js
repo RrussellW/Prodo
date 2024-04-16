@@ -15,7 +15,7 @@ export default function AddReview(data) {
 
   const navigate = useNavigate();
 
-  const addEvent = (e) => {
+  const addReview = (e) => {
     e.preventDefault();
         Axios.post("http://localhost:5000/addreview", {
             email: email,
@@ -61,7 +61,7 @@ export default function AddReview(data) {
 
       </Box>
       <Box sx={{ marginTop: '20px' }}>
-        <Fab color="primary" onClick={addEvent}>
+        <Fab color="primary" onClick={addReview}>
             <AddIcon />
         </Fab>
       </Box>

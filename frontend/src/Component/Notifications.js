@@ -148,9 +148,9 @@ export default function Notifications(data) {
               );
             }))}
             {!hasrequest && (data.role!=='user') && (
-              <Card sx={{ backgroundColor: '#323232', color: 'white'}}>
+              <Card sx={{ backgroundColor: '#323232', color: 'white', marginBottom: '10px'}}>
                 <CardContent>
-                  <Typography variant="subtitle2" sx={{color: '#FDFFC3'}}>No Requests Yet</Typography>
+                  <Typography variant="body1" sx={{color: '#FDFFC3'}}>No Event Requests Yet</Typography>
                 </CardContent>
               </Card>
             )
@@ -158,13 +158,46 @@ export default function Notifications(data) {
 
 
             {hasnotif && (notifs.map((notif, index) => {
+              const isRejected = notif.status === 'rejected'
+              const onGoing = notif.eventstatus
+              const dateOptions = { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' };
+              const formattedDate = new Date(notif.date).toLocaleDateString('en-US', dateOptions);
+
+              const today = new Date();
+              const todayFormatted = today.toLocaleDateString('en-US', dateOptions);
+              const isToday = formattedDate === todayFormatted;
+
               return (
-                <Card key={index} sx={{ backgroundColor: '#323232', color: 'white', margin: '5px'}}>
-                  
-                    <CardContent >
-                        <Typography variant="h1" color="#9AA8FF">{notif.title}</Typography>
-                        <Typography variant="body1" color="#9AA8FF">{notif.message}</Typography>
+                <Card key={index} sx={{ backgroundColor: '#3C3C3C', color: 'white', margin: '5px'}}>
+                    {(onGoing === 1) && isToday && (
+                        <div>
+                          <Typography variant="h6" color="#89FF91">{notif.title}</Typography>
+                          <Typography variant="subtitle2" color="#89FF91">The event {notif.title} is happening today!</Typography>
+                        </div>
+                      )}
+
+                    {!isRejected && (notif.status !== 'pending') && (
+                      <CardContent >
+                        {!onGoing && (
+                          <Typography variant="subtitle2" color="#FF8282">{notif.message}</Typography>
+                        )}
+
+                        {(onGoing === 1) && (
+                          <div>
+                            <Typography variant="h6" color="#89FF91">{notif.title}</Typography>
+                            <Typography variant="subtitle2" color="#89FF91">{notif.message}</Typography>
+                          </div>
+                        )}
+                        
                       </CardContent>
+                    )}
+                    
+                    {isRejected && (
+                      <CardContent >
+                        <Typography variant="h6" color="#FF8282">{notif.title}</Typography>
+                        <Typography variant="subtitle2" color="#FF8282" >Your request to participate in the event {notif.title} has been rejected</Typography>
+                      </CardContent>
+                    )}
 
                     {/*<CardActions sx={{padding: '20px'}}>
                         
@@ -182,9 +215,9 @@ export default function Notifications(data) {
             }))}
 
             {!hasnotif && (
-              <Card sx={{ backgroundColor: '#323232', color: 'white'}}>
+              <Card sx={{ backgroundColor: '#323232', color: 'white', marginTop: '10px'}}>
                 <CardContent>
-                  <Typography variant="subtitle2" sx={{color: '#FDFFC3'}}>No Event Notifications Yet</Typography>
+                  <Typography variant="body1" sx={{color: '#FDFFC3'}}>No Event Notifications Yet</Typography>
                 </CardContent>
               </Card>
             )

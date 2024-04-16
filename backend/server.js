@@ -138,9 +138,9 @@ app.post('/addevent', (req, res) => {
     const date = req.body.date;
     const location = req.body.location;
 
-    if(organizer == "" || title == "" || description == "" || date == "" || location == "") {
-        res.json({message: "Enter correct event details"})
-        return(err);
+    if (organizer == "" || title == "" || description == "" || date == "" || location == "") {
+        res.json({ message: "Enter correct event details" });
+        return;
     }
 
     console.log('post : add event');
@@ -148,54 +148,72 @@ app.post('/addevent', (req, res) => {
     console.log(title);
 
     con.query("SELECT * FROM events WHERE title = ? AND status = '1'", [title],
-    (err,result) => {
-        if(err) {
-            console.log(err);
-            res.json({message: "Error Occurred"})
-        } else {
-            if(result.length > 0) {
-                console.log("Event already exists");
-                res.json({message: "Event already exists"})
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                res.json({ message: "Error Occurred" });
             } else {
-                con.query("INSERT INTO events (title, description, date, location, status, organizer) VALUES (?, ?, ?, ?, 1, ?)", [title, description, date, location, organizer],
-                (err,result) => {
-                    if(result) {
-                        res.json({message: "Event created"});
-                    } else if(err) {
-                        console.log(err);
-                        res.json({message: "Enter correct event details"})
-                    }
+                if (result.length > 0) {
+                    console.log("Event already exists");
+                    res.json({ message: "Event already exists" });
+                } else {
+                    con.query("INSERT INTO events (title, description, date, location, status, organizer) VALUES (?, ?, ?, ?, 1, ?)", [title, description, date, location, organizer],
+                        (err, result) => {
+                            if (result) {
+                                con.query("SELECT event_id FROM events WHERE title = ? AND status = '1'", [title], (err, result) => {
+                                    if (err) {
+                                        console.log(err);
+                                        res.json({ message: "Error Occurred" });
+                                    } else if (result.length > 0) {
+                                        const newid = result[0].event_id;
+                                        const message = "You are now a participant in the event " + title;
+                                        con.query("INSERT INTO notifications (event, message) VALUES (?, ?)", [newid, message], (err, result) => {
+                                            if (err) {
+                                                console.log(err);
+                                                res.json({ message: "Error Occurred" });
+                                            } else {
+                                                console.log("event id = " + newid);
+                                                res.json({ message: "Event created" });
+                                            }
+                                        });
+                                    }
+                                });
+                            } else if (err) {
+                                console.log(err);
+                                res.json({ message: "Enter correct event details" });
+                            }
+                        }
+                    );
                 }
-                )
             }
         }
-    }
-    )
+    );
 });
 
 app.post('/cancelevent', (req, res) => {
-    const title = req.body.title;
+    const eventid = req.body.eventid;
     const reason = req.body.reason;
     //console.log(title + " TITLE")
 
 
-    con.query("SELECT * FROM events WHERE event_id = ?", [title],
+    con.query("SELECT * FROM events WHERE event_id = ?", [eventid],
     (err,result) => {
         if(err) {
             console.log(err);
             return res.json({message: "Error Occurred"})
         } else {
             if(result.length > 0) {
-                con.query("UPDATE events SET status ='0' WHERE event_id = ?", [title],
-                (err,affectedRows) => {
-                    if(affectedRows > 0) {
-                        const message = "The event - " + title + " has been cancelled due to " + reason;
-                        con.query("INSERT INTO notifications (event, message) VALUES (?, ?)",[title, message]);
+                const title = result[0].title;
+                con.query("UPDATE events SET status ='0' WHERE event_id = ?", [eventid],
+                (err,result) => {
+                    if(result.affectedRows > 0) {
+                        const message = "The event " + title + " has been cancelled due to " + reason;
+                        con.query("UPDATE notifications SET message = ? WHERE event = ?",[message, eventid]);
                         console.log("notification")
                         console.log("Cancelled Event")
                         return res.json({message: "Cancelled"});
                     } else if(err) {
-                        return res.json({message: "Failed"})
+                        return res.json({message: "Error"})
                     } else {
                         return res.json({message: "Failed"})
                     }
@@ -212,7 +230,7 @@ app.post('/cancelevent', (req, res) => {
 app.post('/getevents', (req, res) => {
     const user = req.body.user;
 
-    con.query("SELECT DISTINCT e.event_id, e.title,e.description, e.date, e.location, e.organizer, p.status AS pstatus FROM events e LEFT JOIN participants p ON e.event_id = p.event AND p.user = ? WHERE e.status = '1'",[user],
+    con.query("SELECT e.*, p.status AS pstatus, (SELECT COUNT(*) FROM upvotes WHERE event = e.event_id) AS upvotes FROM events e LEFT JOIN participants p ON e.event_id = p.event AND p.user = ? WHERE e.status = '1'",[user],
     (err,result) => {
         if(err) {
             console.log(err);
@@ -256,7 +274,7 @@ app.post('/getnotifications', (req, res) => {
         return res.json({ message: "Please provide a user" });
     }
 
-    con.query(`SELECT n.* FROM notifications n INNER JOIN participants p ON n.event = p.event WHERE p.user = ?`, [user, user],
+    con.query(`SELECT n.*, e.title, e.date, p.status, e.status AS eventstatus FROM notifications n INNER JOIN participants p ON n.event = p.event INNER JOIN events e ON n.event = e.event_id WHERE p.user = ?`, [user],
     (err, result) => {
         if (err) {
             console.log(err);
@@ -277,32 +295,32 @@ app.post('/getnotifications', (req, res) => {
 
 
 app.post('/addupvote', (req, res) => {
-    const email = req.body.email;
-    const title = req.body.title;
+    const email = req.body.user;
+    const eventid = req.body.eventid;
 
-    con.query("SELECT * FROM upvotes WHERE user = ? AND event = ?", [email, title],
+    con.query("SELECT * FROM upvotes WHERE user = ? AND event = ?", [email, eventid],
     (err,result) => {
         if(err) {
             console.log(err);
             res.json({message: "Error Occurred"})
         } else {
             if(result.length > 0) {
-                con.query("DELETE FROM upvotes WHERE user = ? and event = ?", [email, title],
+                con.query("DELETE FROM upvotes WHERE user = ? and event = ?", [email, eventid],
                 (err,result) => {
                     if(result) {
-                        res.json({message: "Removed"});
+                        return res.json({status: "Removed"});
                     } else if(err) {
-                        res.json({message: "Failed"})
+                        return res.json({status: "Failed"})
                     }
                 }
                 )
             } else {
-                con.query("INSERT INTO upvotes (user, event) VALUES (?, ?)", [email, title],
+                con.query("INSERT INTO upvotes (user, event) VALUES (?, ?)", [email, eventid],
                 (err,result) => {
                     if(result) {
-                        res.json({message: "Success"});
+                        return res.json({status: "Success"});
                     } else if(err) {
-                        res.json({message: "Failed"})
+                        return res.json({status: "Failed"})
                     }
                 }
                 )
@@ -316,9 +334,9 @@ app.post('/addreview', (req, res) => {
     const email = req.body.email;
     const title = req.body.title;
     const comment = req.body.comment;
-    console.log(email + "= email")
-    console.log(title + "= title")
-    console.log(comment + "= comment")
+    console.log(email + " = email")
+    console.log(title + " = title")
+    console.log(comment + " = comment")
 
     if(email == "" || title == "" || comment == "") {
         res.json({message: "Enter correct review details"})
@@ -349,6 +367,7 @@ app.post('/getreviews', (req, res) => {
         } else {
             if(result.length > 0) {
                 console.log("Reviews get");
+                console.log(result)
                 return res.json({Status: "Success", reviews: result})
             } else {
                 console.log("No reviews");
@@ -363,14 +382,16 @@ app.post('/joinevent', (req, res) => {
     const user = req.body.user;
     const eventid = req.body.eventid;
 
-    if(eventid == "" || user == "") {
+    if(user == "") {
         res.json({message: "Enter correct review details"})
+        console.log("Correct Details");
         return(err);
     }
 
     con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'accepted'", [user, eventid],
                 (err,result) => {
                     if(err) {
+                        console.log("Select accepted");
                         console.log(err);
                         return res.json({message: "Error Occurred"})
                     } else {
@@ -382,6 +403,7 @@ app.post('/joinevent', (req, res) => {
                             con.query("SELECT * FROM participants WHERE user = ? AND event = ? AND status = 'pending'", [user, eventid],
                             (err,result) => {
                                 if(err) {
+                                    console.log("Select pending");
                                     console.log(err);
                                     return res.json({message: "Error Occurred"})
                                 } else if(result.length > 0) {
@@ -394,6 +416,7 @@ app.post('/joinevent', (req, res) => {
                                                                     return res.json({message: "Request created"});
                                                                 } else if(err) {
                                                                     console.log(err);
+                                                                    console.log("Insert");
                                                                     return res.json({message: "Error occured"})
                                                                 }
                                                             }

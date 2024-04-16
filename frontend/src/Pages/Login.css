@@ -22,6 +22,7 @@ h1 {
     color: black;
 }
 
+
 .box-container {
     display: flex;
     flex-direction: row;

@@ -65,7 +65,10 @@ export default function AddEvents(data) {
         
         <TextField fullWidth id="description" onChange={(e) => {setDescription(e.target.value);setShow(false)}} label="Description" variant="outlined" sx={{backgroundColor: "white", marginBottom: "10px"}}/>
         
-        <input type="date" id="date" onChange={(e) => {setDate(e.target.value);setShow(false)}} name="date" />
+        <input type="date" id="date" onChange={(e) => {
+          setDate(e.target.value);
+          setShow(false)
+          }} name="date" />
 
         <TextField fullWidth id="location" onChange={(e) => {setLocation(e.target.value);setShow(false)}} label="Location" variant="outlined" sx={{backgroundColor: "white", marginBottom: "10px", marginTop: "10px"}}/>
 

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { TextField, Button, Container, Grid, MenuItem, Select, FormControl, InputLabel, Paper } from '@mui/material';
+import { TextField, Button, Container, Grid, MenuItem, Select, FormControl, InputLabel, Paper, Alert } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import Header from '../Component/Header'
+import Header from '../Component/Header';
+
 const theme = createTheme();
 
 const TaskCreation = () => {
     const location = useLocation();
     const email = location.state.email;
+    const [show, setShow] = useState(false)
     const [taskData, setTaskData] = useState({
         category: '',
         color: '',
@@ -17,6 +19,11 @@ const TaskCreation = () => {
         email: email,
         name: ''
     });
+    const [alertData, setAlertData] = useState({
+        open: false,
+        severity: 'success',
+        message: ''
+    });
 
     const handleChange = (e) => {
         setTaskData({ ...taskData, [e.target.name]: e.target.value });
@@ -24,18 +31,55 @@ const TaskCreation = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (
+            taskData.category === '' ||
+            taskData.color === '' ||
+            taskData.deadline === '' ||
+            taskData.description === ''
+        ) {
+            setShow(true);
+            setAlertData({
+                open: true,
+                severity: 'error',
+                message: 'Fields must not be empty'
+            });
+            return;
+        }
         try {
             const response = await axios.post('http://localhost:3001/api/v1/task', taskData);
-            console.log(response.data); // Handle success response
+            console.log(response.data);
+            if (response.data === 'Success') {
+                setShow(true);
+                setAlertData({
+                    open: true,
+                    severity: 'success',
+                    message: 'Task created successfully'
+                });
+            } else {
+                setShow(true);
+                setAlertData({
+                    open: true,
+                    severity: 'warning',
+                    message: response.data
+                });
+            }
+            // Automatically close the alert after 3 seconds
+            setTimeout(() => {
+                setShow(false);
+                setAlertData({
+                    ...alertData,
+                    open: false
+                });
+            }, 3000);
         } catch (error) {
             console.error('Error:', error); // Handle error response
         }
     };
+    
 
     return (
-        
         <ThemeProvider theme={theme}>
-            <Header email = {email}/>
+            <Header email={email} />
             <Container>
                 <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
                     <h2>Create Task</h2>
@@ -109,6 +153,14 @@ const TaskCreation = () => {
                             </Grid>
                         </Grid>
                     </form>
+                    {show && (<Alert
+                        severity={alertData.severity}
+                        onClose={() => setShow(false)}
+                        sx={{ marginTop: '20px' }}
+                        open={alertData.open}
+                    >
+                        {alertData.message}
+                    </Alert>)}
                 </Paper>
             </Container>
         </ThemeProvider>

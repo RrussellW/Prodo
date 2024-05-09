@@ -26,6 +26,11 @@ public class TaskController {
         return taskService.getTasks();
     }
 
+    @PostMapping("/user")
+    public List<Task> getTasksByEmail(@RequestBody String email) {
+        return taskService.getTasksByEmail(email);
+    }
+
     @PostMapping
     public String registerNewTask(@RequestBody Task task) {
         return taskService.addNewTask(task);

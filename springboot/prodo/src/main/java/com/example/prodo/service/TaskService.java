@@ -23,8 +23,12 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
+    public List<Task> getTasksByEmail(String email) {
+        return taskRepository.findByEmail(email);
+    }
+
     public String addNewTask(Task task) {
-        Optional<Task> taskOptional = taskRepository.findByName(task.getName());
+        Optional<Task> taskOptional = taskRepository.findByName(task.getName(), task.getEmail());
         if (taskOptional.isPresent()) {
             return "Task already exists";
         }

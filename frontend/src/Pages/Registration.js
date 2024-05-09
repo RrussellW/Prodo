@@ -16,17 +16,17 @@ export default function Registration() {
 
     const register = (e) => {
         e.preventDefault();
-        Axios.post("http://localhost:5000/registration", {
+        Axios.post("http://localhost:3001/api/v1/user", {
             email: email,
             password: password,
         }).then((res) =>  {
-            if(res.data.message === "Account created") {
-                setMessage(res.data.message);
-                setAlert("success")
+            if(res.data === "Email already taken") {
+                setMessage("Email already taken");
+                setAlert("warning")
                 setShow(true)
             } else {
-                setMessage(res.data.message);
-                setAlert("warning")
+                setMessage("Success");
+                setAlert("success")
                 setShow(true)
             }
         })

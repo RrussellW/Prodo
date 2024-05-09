@@ -26,16 +26,13 @@ return (
        }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{color: '#9AA8FF'}}>
-          METRO
+          Prodo
         </Typography>
-        <Typography variant="h6" component="div" sx={{color: '#FDFFC3'}}>
-          Events
-        </Typography>
-        <Typography variant="h6" component="div" sx={{flexGrow: 1, color: '#9AA8FF', marginLeft: '50px'}}>
-          <span> {data.role}</span>
+        <Typography variant="h6" component="div" sx={{flexGrow: 1, color: '#FDFFC3', marginLeft: '-2px'}}>
+          Reviewer
         </Typography>
 
-        <Button color="inherit" sx={{color: '#FF8282'}} onClick={logout}>Logout {data.name}</Button>
+        <Button color="inherit" sx={{color: '#FF8282'}} onClick={logout}>Logout {data.email}</Button>
       </Toolbar>
     </AppBar>
   </Box>

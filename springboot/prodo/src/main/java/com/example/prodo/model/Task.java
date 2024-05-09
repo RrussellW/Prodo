@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table
-public class Tasks {
+public class Task {
     @Id
     @GeneratedValue
     private int task_id;
@@ -20,10 +20,10 @@ public class Tasks {
     private String category;
     private String color;
 
-    public Tasks() {
+    public Task() {
     }
 
-    public Tasks(String email, String name, String description, LocalDate deadline, String category, String color) {
+    public Task(String email, String name, String description, LocalDate deadline, String category, String color) {
         this.email = email;
         this.name = name;
         this.description = description;
@@ -86,5 +86,18 @@ public class Tasks {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    @Override
+    public String toString() {
+        return "Tasks{" +
+                "task_id=" + task_id +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", deadline=" + deadline +
+                ", category='" + category + '\'' +
+                ", color='" + color + '\'' +
+                '}';
     }
 }

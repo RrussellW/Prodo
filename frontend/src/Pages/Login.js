@@ -20,16 +20,16 @@ export default function Login() {
 
     const login = (e) => {
         e.preventDefault();
-        Axios.post("http://localhost:5000/login", {
+        Axios.post("http://localhost:3001/api/v1/user/login", {
             email: email,
             password: password,
         }).then((res) =>  {
-            if(res.data.Status === "Success") {
-                navigate('/home');
-            } else {
+            if(res.data === "User does not exist") {
                 setAlert("warning")
                 setShow(true)
-                setMessage(res.data.message);
+                setMessage("Incorrect Email or Password");
+            } else {
+                navigate('/home',{ state: { email: email } });
             }
         })
         .catch(err => console.log(err));

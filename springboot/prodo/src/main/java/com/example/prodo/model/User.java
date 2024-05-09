@@ -1,20 +1,26 @@
 package com.example.prodo.model;
 
-public class userModel {
+import jakarta.persistence.*;
+
+@Entity
+@Table
+public class User {
+    @Id
+    @GeneratedValue
     private int user_id;
     private String email;
     private String password;
 
-    public userModel() {
+    public User() {
     }
 
-    public userModel(int user_id, String email, String password) {
+    public User(int user_id, String email, String password) {
         this.user_id = user_id;
         this.email = email;
         this.password = password;
     }
 
-    public userModel(String email, String password) {
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
     }

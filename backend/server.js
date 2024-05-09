@@ -40,7 +40,7 @@ app.post('/registration', (req, res) => {
                 console.log("User already exists");
                 res.json({message: "User already exists"})
             } else {
-                con.query("INSERT INTO users (email, password, role) VALUES (?, ?, 'user')", [email, password],
+                con.query("INSERT INTO users (email, password) VALUES (?, ?)", [email, password],
                 (err,result) => {
                     if(result) {
                         res.json({message: "Account created"});
@@ -576,7 +576,7 @@ app.get('/home',verifyUser, (req, res) => {
 
 
 app.listen(5000, () => {
-    console.log('app is running');
+    console.log('Backend is running');
 });
 
 const con = mysql.createConnection(
@@ -584,6 +584,6 @@ const con = mysql.createConnection(
         user: "root",
         host: "localhost",
         password: "",
-        database: "metroevents",
+        database: "prodo",
     }
 )
